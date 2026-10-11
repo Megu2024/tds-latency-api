@@ -1,8 +1,18 @@
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+@app.options("/api/latency")
+def latency_options():
+    return Response(
+        status_code=204,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        },
+    )
 
 # Allow POST requests from any origin, as required by the assignment.
 app.add_middleware(
@@ -79,7 +89,8 @@ def home():
 
 
 @app.post("/api/latency")
-def latency(payload: dict):
+def latency(payload: dict, response: Response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
     regions = payload.get("regions")
     threshold = payload.get("threshold_ms")
 
